@@ -15,18 +15,40 @@ const getAllTransactions = (req, res) => {
 // Função para adicionar uma nova transação
 const addTransaction = (req, res) => {
     const {date, amount, description, category, account, user_id} = req.body;
-    db.query(
-        'INSERT INTO transactions(date, amount, description, category, account, user_id) VALUES (?, ?, ?, ?, ?, ?)',
-        [date, amount, description, category, account, user_id],
-        (err, results) =>{
-            if(err){
-                console.error('Erro ao adicionar transação');
-                res.status(500).send('Erro ao adicionar transação');
-                return;
-            }
-            res.status(201).send('Transação adiconada com sucesso');
+
+// Verificar se a transação já existe 
+db.query(
+    'SELECT * FROM transactions WHERE date = ? AND amount = ? AND description = ? AND category = ? AND account = ? AND user_id = ?',
+    [date, amount, descript, category, account, user_id],
+    (err, results) => {
+        if(err){
+            console.error('Erro ao verificar transação:', err);
+            res.status(500).send('Eeeo ao verificar transação');
+            return;
         }
-    );
+
+        if(results.length > 0){
+            // Se a transação já existe
+            res.status(400).send('Transação duplicada');
+            return;
+        }
+
+        db.query(
+            'INSERT INTO transactions(date, amount, description, category, account, user_id) VALUES (?, ?, ?, ?, ?, ?)',
+            [date, amount, description, category, account, user_id],
+            (err, results) =>{
+                if(err){
+                    console.error('Erro ao adicionar transação');
+                    res.status(500).send('Erro ao adicionar transação');
+                    return;
+                }
+                res.status(201).send('Transação adiconada com sucesso');
+                }
+         );
+     }
+                //a verificar
+    )
+   
 };
 
 
@@ -75,10 +97,24 @@ const updateTransactionPatch = (req, res) =>{
     );
 };
 
+// Função para deletar uma transação existente 
+const deleteTransaction = (req, res) =>{
+    const{id} = req.params;
+    db.query('DELETE FROM transactions WHERE id = ?',[id],(err,results) =>{
+        if(err){
+            console.error('Erro ao deletar transação:', err);
+            res.status(500).send('Erro ao deletar transação');
+            return;
+        }
+        res.send('Transação deletada com sucesso');
+    });
+};
+
 module.exports = {
     getAllTransactions,
     addTransaction,
     updateTransactionPut,
-    updateTransactionPatch
+    updateTransactionPatch,
+    deleteTransaction
 };
 

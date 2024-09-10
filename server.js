@@ -3,7 +3,7 @@ dotenv.config();
 
 const express =require('express');
 const cors = require('cors'); // Importa o pacote body-parser para permitir requisições de difrentes origens
-const bodyParser = require('body-parser'); ; // Importa o pacote body-parser para analisar o corpo das requisições HTTP
+const bodyParser = require('body-parser');// Importa o pacote body-parser para analisar o corpo das requisições HTTP
 
 const db = require('./config/db'); //Importa a conexão com o banco de dados
 const transactionsRoutes = require('./routes/transactions') // importa as rotas de transações 
